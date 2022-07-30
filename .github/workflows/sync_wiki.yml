@@ -1,4 +1,4 @@
-name: Sync wiki
+name: Synchronize wiki
 
 on: [workflow_dispatch]
 
@@ -6,9 +6,37 @@ jobs:
   sync_wiki:
     runs-on: ubuntu-20.04
     steps:
-      - name: Sync
+      - name: Get wiki commit hash
+        uses: jannekem/run-python-script-action@v1.2
+        with:
+          script: |
+            import requests
+            commit = requests.get("https://api.github.com/repos/x64dbg/wiki/commits/master", {"per_page": 1}).json()
+            print(commit["sha"])
+            set_env("WIKI_SHA", commit["sha"])
+
+      - name: Set commit status as pending
+        uses: myrotvorets/set-commit-status-action@1.1.5
+        with:
+          token: ${{ secrets.WIKI_TOKEN }}
+          status: pending
+          repo: x64dbg/wiki
+          sha: ${{ env.WIKI_SHA }}
+          context: ${{ github.workflow }}
+
+      - name: Synchronize wiki repository
         run: |
           git clone https://github.com/x64dbg/wiki wiki
           cd wiki
           git remote add wiki https://x64dbgbot:${{ secrets.WIKI_TOKEN }}@github.com/x64dbg/x64dbg.wiki.git
           git push --force wiki master
+
+      - name: Set final commit status
+        uses: myrotvorets/set-commit-status-action@1.1.5
+        if: ${{ always() }}
+        with:
+          token: ${{ secrets.WIKI_TOKEN }}
+          status: ${{ job.status }}
+          repo: x64dbg/wiki
+          sha: ${{ env.WIKI_SHA }}
+          context: ${{ github.workflow }}
