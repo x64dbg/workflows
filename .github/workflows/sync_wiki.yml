@@ -10,5 +10,5 @@ jobs:
         run: |
           git clone https://github.com/x64dbg/wiki wiki
           cd wiki
-          git remote add wiki https://x64dbgbot:${{ secrets.WIKI_TOKEN }}@github.com/x64dbg/wiki.wiki.git
+          git remote add wiki https://x64dbgbot:${{ secrets.WIKI_TOKEN }}@github.com/x64dbg/x64dbg.wiki.git
           git push --force wiki master
