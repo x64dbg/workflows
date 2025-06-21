@@ -4,10 +4,10 @@ on: [ workflow_dispatch ]
 
 jobs:
   sync_wiki:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Get wiki commit hash
-        uses: jannekem/run-python-script-action@088ec07b341540e5742f0426f5fdaf81950bac45 # pin@v1.2
+        uses: jannekem/run-python-script-action@bbfca66c612a28f3eeca0ae40e1f810265e2ea68 # v1.7
         with:
           script: |
             import requests
@@ -16,7 +16,7 @@ jobs:
             set_env("WIKI_SHA", commit["sha"])
 
       - name: Set commit status as pending
-        uses: myrotvorets/set-commit-status-action@74391422f441069685b0836133f6117f286debe5 # pin@1.1.5
+        uses: myrotvorets/set-commit-status-action@3730c0a348a2ace3c110851bed53331bc6406e9f # v2.0.1
         with:
           token: ${{ secrets.WIKI_TOKEN }}
           status: pending
@@ -32,7 +32,7 @@ jobs:
           git push --force wiki master
 
       - name: Set final commit status
-        uses: myrotvorets/set-commit-status-action@74391422f441069685b0836133f6117f286debe5 # pin@1.1.5
+        uses: myrotvorets/set-commit-status-action@3730c0a348a2ace3c110851bed53331bc6406e9f # v2.0.1
         if: ${{ always() }}
         with:
           token: ${{ secrets.WIKI_TOKEN }}
